@@ -2,7 +2,6 @@ function autocomplete(input, latInput, lngInput) {
   if (!input) return //skip fn from running if no input on page
 
   const dropdown = new google.maps.places.Autocomplete(input)
-  console.log(dropdown)
   dropdown.addListener("place_changed", () => {
     const place = dropdown.getPlace()
     console.log(place)
