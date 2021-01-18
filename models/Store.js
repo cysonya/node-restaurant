@@ -1,6 +1,6 @@
-const mongoose = require("mongoose")
-mongoose.Promise = global.Promise
-const slug = require("slugs")
+const mongoose = require("mongoose");
+mongoose.Promise = global.Promise;
+const slug = require("slugs");
 
 const storeSchema = new mongoose.Schema({
   name: {
@@ -35,15 +35,23 @@ const storeSchema = new mongoose.Schema({
     },
   },
   photo: String,
-})
+});
 
 storeSchema.pre("save", function (next) {
   if (!this.isModified("name")) {
-    next()
-    return
+    next();
+    return;
   }
-  this.slug = slug(this.name)
-  next()
-})
+  this.slug = slug(this.name);
+  next();
+});
 
-module.exports = mongoose.model("Store", storeSchema)
+storeSchema.statics.getTagsList = function () {
+  return this.aggregate([
+    { $unwind: "$tags" },
+    { $group: { _id: "$tags", count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+  ]);
+};
+
+module.exports = mongoose.model("Store", storeSchema);
