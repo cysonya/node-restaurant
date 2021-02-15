@@ -22,13 +22,31 @@ exports.validateRegister = (req, res, next) => {
       body: req.body,
       flashes: req.flash(),
     });
-    return;
+    return; // stop the fn from running if there are errors
   }
-  next();
+  next(); // there are no errors
 };
 
 exports.register = async (req, res, next) => {
   const user = new User({ email: req.body.email, name: req.body.name });
   await User.register(user, req.body.password);
   next();
+};
+
+exports.account = (req, res) => {
+  res.render("account", { title: "Edit Your Account" });
+};
+
+exports.updateAccount = async (req, res) => {
+  const updates = {
+    name: req.body.name,
+    email: req.body.email,
+  };
+  const user = await User.findOneAndUpdate(
+    { _id: req.user._id },
+    { $set: updates },
+    { new: true, runValidators: true }
+  );
+  req.flash("success", "Updated the profile!");
+  res.redirect("/account");
 };
